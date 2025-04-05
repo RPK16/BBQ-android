@@ -1,25 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Title for Cook Fragment -->
-    <EditText
-        android:id="@+id/target_pit_temp2"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:inputType="number"
-        android:text="250"
-        android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@+id/target_pit_temp_label"
-        app:layout_constraintTop_toBottomOf="@+id/cook_title" />
-
+    <!-- Title -->
     <TextView
         android:id="@+id/cook_title"
         android:layout_width="match_parent"
@@ -32,67 +19,92 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Target Pit Temperature -->
+    <!-- Pit Temp -->
+
+    <!-- Food Temp -->
     <TextView
         android:id="@+id/target_pit_temp_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:text="Set Pit Temperature"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cook_title"/>
+        app:layout_constraintTop_toBottomOf="@id/cook_title" />
 
     <EditText
         android:id="@+id/target_pit_temp"
-        android:layout_width="48dp"
+        android:layout_width="64dp"
         android:layout_height="48dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:inputType="number"
         android:text="250"
         android:textSize="24sp"
-        app:layout_constraintStart_toEndOf="@+id/target_pit_temp_label"
-        app:layout_constraintTop_toBottomOf="@+id/cook_title" />
+        app:layout_constraintStart_toEndOf="@id/target_pit_temp_label"
+        app:layout_constraintTop_toBottomOf="@id/cook_title" />
 
-
-
-    <!-- Target Food Temperature -->
     <TextView
         android:id="@+id/target_food_temp_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="48dp"
         android:text="Set Food Temperature"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/target_pit_temp"/>
+        app:layout_constraintTop_toBottomOf="@id/target_pit_temp" />
 
+    <!-- Start/Stop Button -->
 
-    <!-- Food Probe Radio Buttons -->
+    <!-- Current vs Target Info (shown during session) -->
 
     <EditText
         android:id="@+id/target_food_temp"
-        android:layout_width="48dp"
+        android:layout_width="64dp"
         android:layout_height="48dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="32dp"
         android:inputType="number"
         android:text="160"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="@+id/target_pit_temp2"
-        app:layout_constraintTop_toBottomOf="@+id/cook_title" />
-
-    <!-- Start/Stop button -->
+        app:layout_constraintStart_toEndOf="@id/target_food_temp_label"
+        app:layout_constraintTop_toBottomOf="@id/target_pit_temp" />
 
     <Button
         android:id="@+id/start_stop_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="76dp"
+        android:layout_marginTop="84dp"
         android:text="Start Cooking"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/target_food_temp" />
+        app:layout_constraintTop_toBottomOf="@id/target_food_temp" />
+
+    <LinearLayout
+        android:id="@+id/session_info_layout"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/start_stop_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp">
+
+        <TextView
+            android:id="@+id/current_pit_temp"
+            android:text="Current Pit Temp: --°C"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/current_food_temp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Current Food Temp: --°C"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

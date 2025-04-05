@@ -28,6 +28,7 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
 
     private lateinit var sharedViewModel: SharedViewModel
     private var currentIp: String? = null
+    private var isHeating = false
 
     private var remainingTime: Long = 0
 
@@ -73,9 +74,24 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
                 return@setOnClickListener
             }
 
-            cookingSession.endTime = (System.currentTimeMillis() / 1000) + (fanRuntimeSlider.progress * 60)
-            controllerRepository.startCooking(ip, cookingSession) {}
-            startCountdown()
+            if (!isHeating) {
+                // Start heating
+                isHeating = true
+                startHeatingButton.text = "Stop Heating"
+
+                cookingSession.endTime = (System.currentTimeMillis() / 1000) + (fanRuntimeSlider.progress * 60)
+                controllerRepository.startCooking(ip, cookingSession) {}
+
+                startCountdown()
+            } else {
+                // Stop heating
+                isHeating = false
+                startHeatingButton.text = "Start Heating"
+
+                controllerRepository.stopCooking(ip) {}
+                handler.removeCallbacks(countdownRunnable)
+                remainingTimeTextView.visibility = View.GONE
+            }
         }
 
         temperaturePollingRunnable = object : Runnable {

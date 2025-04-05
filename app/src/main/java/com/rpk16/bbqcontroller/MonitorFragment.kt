@@ -15,7 +15,6 @@ class MonitorFragment : Fragment(R.layout.fragment_monitor) {
     private lateinit var currentFoodTempTextView: TextView
     private lateinit var currentFanSpeedTextView: TextView
     private lateinit var updateStateButton: Button
-    private lateinit var endSessionButton: Button
 
     private val handler = Handler()
     private lateinit var statePollingRunnable: Runnable
@@ -34,7 +33,6 @@ class MonitorFragment : Fragment(R.layout.fragment_monitor) {
         currentFanSpeedTextView = view.findViewById(R.id.current_fan_speed)
 
         updateStateButton = view.findViewById(R.id.session_status_button)
-        endSessionButton = view.findViewById(R.id.session_end_button)
 
         sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
@@ -65,12 +63,6 @@ class MonitorFragment : Fragment(R.layout.fragment_monitor) {
                         }
                     }
                 }
-            }
-        }
-
-        endSessionButton.setOnClickListener {
-            currentIp?.let { ip ->
-                controllerRepository.stopCooking(ip) {}
             }
         }
 
