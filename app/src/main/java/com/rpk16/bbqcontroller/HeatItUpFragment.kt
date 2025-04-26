@@ -16,7 +16,6 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
     private lateinit var startHeatingButton: Button
     private lateinit var fanRuntimeSlider: SeekBar
     private lateinit var fanRuntimeDisplayTextView: TextView
-    private lateinit var remainingTimeTextView: TextView
     private lateinit var cookingSession: CookingSession
     private lateinit var cookingState: State
 
@@ -54,13 +53,12 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
         startHeatingButton = view.findViewById(R.id.start_fire_button)
         fanRuntimeSlider = view.findViewById(R.id.fan_runtime_slider)
         fanRuntimeDisplayTextView = view.findViewById(R.id.fan_minutes)
-        remainingTimeTextView = view.findViewById(R.id.remaining_time)
 
         fanRuntimeSlider.progress = 5
 
         fanRuntimeSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                fanRuntimeDisplayTextView.text = progress.toString()
+                fanRuntimeDisplayTextView.text = String.format("%02d:%02d", progress, 0)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
@@ -75,7 +73,6 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
             }
 
             if (!isHeating) {
-                // Start heating
                 isHeating = true
                 startHeatingButton.text = "Stop Heating"
 
@@ -84,13 +81,11 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
 
                 startCountdown()
             } else {
-                // Stop heating
                 isHeating = false
                 startHeatingButton.text = "Start Heating"
 
                 controllerRepository.stopCooking(ip) {}
                 handler.removeCallbacks(countdownRunnable)
-                remainingTimeTextView.visibility = View.GONE
             }
         }
 
@@ -127,15 +122,15 @@ class HeatItUpFragment : Fragment(R.layout.fragment_heat_it_up) {
                     val formattedTime = String.format("%02d:%02d", minutes, seconds)
 
                     activity?.runOnUiThread {
-                        remainingTimeTextView.visibility = View.VISIBLE
-                        remainingTimeTextView.text = formattedTime
+                        fanRuntimeDisplayTextView.text = formattedTime
                     }
 
                     remainingTime -= 1
                     handler.postDelayed(this, 1000)
                 } else {
                     activity?.runOnUiThread {
-                        remainingTimeTextView.visibility = View.GONE
+                        isHeating = false
+                        startHeatingButton.text = "Start Heating"
                     }
                 }
             }

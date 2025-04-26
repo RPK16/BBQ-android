@@ -1,9 +1,14 @@
 package com.rpk16.bbqcontroller
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.*
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 
@@ -52,6 +57,7 @@ class CookFragment : Fragment(R.layout.fragment_cook) {
             state = null,
         )
 
+
         startStopCookButton.setOnClickListener {
             val ip = currentIp
 
@@ -60,6 +66,9 @@ class CookFragment : Fragment(R.layout.fragment_cook) {
                 return@setOnClickListener
             }
 
+            CookNotificationService.isFoodAlmostReadyNotified = false
+            CookNotificationService.isFoodReadyNotified = false
+
             if (!isCooking) {
                 cookingSession.endTime = (System.currentTimeMillis() / 1000) + 86400
                 cookingSession.targetFoodTemp = targetFoodTempInput.text.toString().toIntOrNull() ?: 160
@@ -67,10 +76,27 @@ class CookFragment : Fragment(R.layout.fragment_cook) {
 
                 controllerRepository.startCooking(ip, cookingSession) { response ->
                     activity?.runOnUiThread {
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS)
+                            != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+                            return@runOnUiThread
+                        }
+
                         isCooking = true
                         startStopCookButton.text = "Stop Cooking"
                         sessionInfoLayout.visibility = View.VISIBLE
                         startPolling()
+
+                        CookNotificationService.currentPitTemp = cookingSession.targetPitTemp ?: 250
+                        CookNotificationService.currentFoodTemp = cookingSession.targetFoodTemp ?: 160
+
+                        val notifyIntent = Intent(requireContext(), CookNotificationService::class.java).apply {
+                            action = "START_COOK"
+                        }
+                        ContextCompat.startForegroundService(requireContext(), notifyIntent)
                     }
                 }
             } else {
@@ -80,12 +106,32 @@ class CookFragment : Fragment(R.layout.fragment_cook) {
                         startStopCookButton.text = "Start Cooking"
                         sessionInfoLayout.visibility = View.GONE
                         stopPolling()
+
+                        val stopIntent = Intent(requireContext(), CookNotificationService::class.java).apply {
+                            action = "STOP_COOK_FROM_NOTIFICATION"
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS)
+                            != PackageManager.PERMISSION_GRANTED
+                        ) {
+                            requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
+                            return@runOnUiThread
+                        }
+
+                        requireContext().startService(stopIntent)
                     }
                 }
             }
         }
 
         setupPollingRunnable()
+
+        if (!CookNotificationService.isActive && isCooking) {
+            isCooking = false
+            startStopCookButton.text = "Start Cooking"
+            sessionInfoLayout.visibility = View.GONE
+            stopPolling()
+        }
     }
 
     private fun setupPollingRunnable() {
@@ -97,11 +143,27 @@ class CookFragment : Fragment(R.layout.fragment_cook) {
                             activity?.runOnUiThread {
                                 currentPitTempView.text = "Current Pit Temp: ${it.probePitTemp}°C"
                                 currentFoodTempView.text = "Current Food Temp: ${it.probe1Temp}°C"
+
+                                CookNotificationService.updateTemps(
+                                    context = requireContext(),
+                                    pitTemp = it.probePitTemp ?: 0,
+                                    foodTemp = it.probe1Temp ?: 0
+                                )
+                                if(it.probe1Temp > 0.95 * cookingSession.targetFoodTemp!! &&
+                                    !CookNotificationService.isFoodAlmostReadyNotified){
+                                    CookNotificationService.sendFoodAlmostReadyNotification(requireContext())
+                                    CookNotificationService.isFoodAlmostReadyNotified = true
+                                } else if(it.probe1Temp >= cookingSession.targetFoodTemp!! &&
+                                    !CookNotificationService.isFoodReadyNotified){
+                                    CookNotificationService.sendFoodReadyNotification(requireContext())
+                                    CookNotificationService.isFoodReadyNotified = true
+                                    startStopCookButton.performClick();
+                                }
                             }
                         }
                     }
                 }
-                handler.postDelayed(this, 5000)
+                handler.postDelayed(this, 3000)
             }
         }
     }

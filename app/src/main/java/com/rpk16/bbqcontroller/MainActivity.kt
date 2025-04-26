@@ -1,11 +1,13 @@
 package com.rpk16.bbqcontroller
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import androidx.viewpager2.widget.ViewPager2
@@ -81,6 +83,9 @@ class MainActivity : AppCompatActivity() {
                     if (!found && response.isSuccessful && body?.contains("pt=") == true) {
                         Log.e("WifiSetup", "BBQ Controller found on $ip ")
                         found = true
+                        val sharedPrefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+                        sharedPrefs.edit().putString("controller_ip", ip).apply()
+
                         onFound(ip)
                     }
                 } catch (_: Exception) {

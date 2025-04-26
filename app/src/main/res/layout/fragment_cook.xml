@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp">
@@ -45,6 +46,16 @@
         app:layout_constraintTop_toBottomOf="@id/cook_title" />
 
     <TextView
+        android:id="@+id/celsius_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="°C"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/target_pit_temp"
+        app:layout_constraintStart_toEndOf="@+id/target_pit_temp"
+        app:layout_constraintTop_toTopOf="@+id/target_pit_temp" />
+
+    <TextView
         android:id="@+id/target_food_temp_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,6 +79,16 @@
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@id/target_food_temp_label"
         app:layout_constraintTop_toBottomOf="@id/target_pit_temp" />
+
+    <TextView
+        android:id="@+id/celsius_label2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="°C"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="@+id/target_food_temp"
+        app:layout_constraintStart_toEndOf="@+id/target_food_temp"
+        app:layout_constraintTop_toTopOf="@+id/target_food_temp" />
 
     <Button
         android:id="@+id/start_stop_button"
