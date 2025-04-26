@@ -53,8 +53,7 @@ class CookFragment : Fragment(R.layout.fragment_cook) {
         )
 
         startStopCookButton.setOnClickListener {
-            //val ip = currentIp
-            val ip = "192.168.205.245"
+            val ip = currentIp
 
             if (ip.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "BBQ Controller not connected", Toast.LENGTH_SHORT).show()
